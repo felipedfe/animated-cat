@@ -200,19 +200,19 @@ function App() {
 
       <section className="controller">
         <div className="controller__item">
-          <span>cabeça</span>
+          <span>head</span>
           <Switch isOn={isAnimating} onToggle={() => setIsAnimating(prev => !prev)} />
         </div>
         <div className="controller__item">
-          <span>luz</span>
+          <span>light</span>
           <Switch isOn={lightOn} onToggle={() => setLightOn(prev => !prev)} />
         </div>
         <div className="controller__item">
-          <span>olhos</span>
+          <span>eyes</span>
           <Switch isOn={isMovingPupils} onToggle={movePupils} disabled={isMovingPupils} />
         </div>
         <div className="controller__item">
-          <span>língua</span>
+          <span>tongue</span>
           <Switch isOn={tongueOut} onToggle={() => setTongueOut(prev => !prev)} />
         </div>
       </section>
