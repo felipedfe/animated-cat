@@ -1,0 +1,214 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'DynaPuff', sans-serif;
+  color: #2d2d2d;
+}
+
+main {
+  padding: 1rem;
+  background: #f8e8ec;
+  min-height: 100vh;
+  display: flex;
+  /* flex-direction: column; */
+  justify-content: center;
+  align-items: center;
+}
+
+/* Moldura = silhueta da cabeça (399×371 nos assets) */
+.cat {
+  position: relative;
+  width: min(92vw, 400px);
+  aspect-ratio: 399 / 371;
+  isolation: isolate;
+  /* background-color: lightgrey; */
+  margin-right: 150px;
+}
+
+.cat img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.cat__head {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* object-fit: contain; */
+  z-index: 0;
+}
+
+.cat__ear {
+  position: absolute;
+  z-index: 1;
+  width: 26%;
+  top: -3%;
+  /* background-color: red; */
+}
+
+.cat__ear img {
+  width: 100%;
+  height: auto;
+}
+
+.cat__ear--left {
+  left: 5%;
+  /* transform: scaleX(-1) → framer-motion: initial={{ scaleX: -1 }} */
+}
+
+.cat__ear--right {
+  right: 5%;
+}
+
+.cat__forehead {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 13%;
+  width: 16%;
+  /* transform: translateX(-50%) → framer-motion: initial={{ x: "-50%" }} */
+}
+
+.cat__forehead img {
+  width: 100%;
+  height: auto;
+}
+
+.cat__forehead-light {
+  position: absolute;
+  width: 45%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #39f305;
+  top: 38%;
+  left: 48%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.cat__whiskers {
+  position: absolute;
+  z-index: 9;
+  width: 60%;
+  top: 45%;
+}
+
+.cat__whiskers img {
+  width: 100%;
+  height: auto;
+}
+
+.cat__whiskers--right {
+  left: 65%;
+}
+
+.cat__whiskers--left {
+  right: 65%;
+}
+
+.cat__whiskers--left img {
+  transform: scaleX(-1);
+}
+
+/* Olhos: só o contorno espelha à esquerda; cada pupila tem % próprios (como as orelhas) */
+.cat__eye {
+  position: absolute;
+  z-index: 7;
+  width: 30%;
+  top: 33%;
+}
+
+.cat__eye-outline {
+  width: 100%;
+  height: auto;
+}
+
+.cat__eye--right {
+  right: 11%;
+}
+
+.cat__eye--left {
+  left: 11%;
+}
+
+/* transform: scaleX(-1) → framer-motion: initial={{ scaleX: -1 }} em motion.img */
+
+.cat__pupil {
+  position: absolute;
+  width: 18%;
+}
+
+.cat__pupil--right {
+  top: 48%;
+  left: 50%;
+  /* transform: translate(-50%, -50%) → framer-motion: initial={{ x: "-50%", y: "-50%" }} */
+}
+
+.cat__pupil--left {
+  top: 48%;
+  right: 40%;
+  /* transform: translate(50%, -50%) → framer-motion: initial={{ x: "50%", y: "-50%" }} */
+}
+
+.cat__nose {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  top: 60%;
+  width: 40%;
+  /* transform: translate(-50%, -50%) → framer-motion: initial={{ x: "-50%", y: "-50%" }} */
+}
+
+.cat__nose img {
+  width: 100%;
+  height: auto;
+}
+
+.cat__tongue {
+  position: absolute;
+  z-index: 5;
+  left: 52%;
+  top: 55%;
+  width: 14%;
+  /* transform: translateX(-50%) → framer-motion: initial={{ x: "-50%" }} */
+}
+
+.cat__tongue img {
+  width: 100%;
+  height: auto;
+}
+
+.controller {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.controller__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 14px;
+}
+
+.switch {
+  flex-shrink: 0;
+  width: 52px;
+  height: 28px;
+  border-radius: 14px;
+  padding: 3px;
+}
+
+.switch__knob {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
