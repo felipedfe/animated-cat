@@ -1,4 +1,4 @@
-# React Motion Playground
+# Animated Cat
 
 A tiny Framer Motion playground: a layered cat you animate by pressing buttons and toggling controls—head motion, tongue, pupils, whiskers, and lights—built with React and Vite.
 
