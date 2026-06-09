@@ -1,6 +1,7 @@
 import { motion, useMotionValue, useTransform, useSpring, animate } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
-import Switch from './components/Switch'
+import { useWebcam } from './hooks/useWebcam'
+import { useHandTracker } from './hooks/useHandTracker'
 import bigode from './assets/bigode.png'
 import botao from './assets/botao.png'
 import cabeca from './assets/cabeca.png'
@@ -13,10 +14,14 @@ import orelha from './assets/orelha.png'
 function App() {
   const headY = useMotionValue(0)
   const controlsRef = useRef(null)
-  const [isAnimating, setIsAnimating] = useState(false)
-  const [tongueOut, setTongueOut] = useState(false)
-  const [lightOn, setLightOn] = useState(false)
   const [isMovingPupils, setIsMovingPupils] = useState(false)
+
+  const { videoRef, status } = useWebcam()
+  const fingerCount = useHandTracker(videoRef)
+
+  const isAnimating = fingerCount === 1 || fingerCount === 5
+  const lightOn = fingerCount === 2 || fingerCount === 5
+  const tongueOut = fingerCount === 4 || fingerCount === 5
 
   const pupilX = useMotionValue(0)
   const pupilY = useMotionValue(0)
@@ -28,84 +33,73 @@ function App() {
 
   async function movePupils() {
     setIsMovingPupils(true)
-
-    // Move para a esquerda e levemente para cima
     await Promise.all([
       animate(pupilX, -12, { duration: 0.6, ease: 'easeInOut' }),
       animate(pupilY, -5, { duration: 0.6, ease: 'easeInOut' }),
     ])
     await sleep(1000)
-
-    // Varre para a direita (passa pelo centro)
     await Promise.all([
       animate(pupilX, 12, { duration: 0.9, ease: 'easeInOut' }),
       animate(pupilY, -5, { duration: 0.9, ease: 'easeInOut' }),
     ])
     await sleep(1000)
-
-    // Volta ao centro
     await Promise.all([
       animate(pupilX, 0, { duration: 0.4, ease: 'easeOut' }),
       animate(pupilY, 0, { duration: 0.4, ease: 'easeOut' }),
     ])
-
     setIsMovingPupils(false)
   }
+
+  // Dispara a animação dos olhos quando o gesto for 3 ou 5 dedos
+  useEffect(() => {
+    if ((fingerCount === 3 || fingerCount === 5) && !isMovingPupils) {
+      movePupils()
+    }
+  }, [fingerCount])
 
   useEffect(() => {
     if (isAnimating) {
       controlsRef.current = animate(headY, [0, -20, 0], {
         duration: 3,
         repeat: Infinity,
-        ease: "easeInOut",
+        ease: 'easeInOut',
       })
     } else {
       controlsRef.current?.stop()
-      animate(headY, 0, { type: "spring", stiffness: 120, damping: 20 })
+      animate(headY, 0, { type: 'spring', stiffness: 120, damping: 20 })
     }
   }, [isAnimating, headY])
 
-  // Quando a cabeça sobe (y = -20), a orelha tende para 10°
   const earRotateTarget = useTransform(headY, [0, -20], [0, 10])
   const earRotate = useSpring(earRotateTarget, { stiffness: 15, damping: 8 })
 
-  // Bigodes: mais leves, respondem mais rápido que as orelhas
   const whiskerRotateTarget = useTransform(headY, [0, -20], [0, 6])
   const whiskerRotateRight = useSpring(whiskerRotateTarget, { stiffness: 30, damping: 8 })
-  // Bigode esquerdo gira no sentido oposto
   const whiskerRotateLeft = useTransform(whiskerRotateRight, v => -v)
+
+  const gestureLabel = [
+    'Nenhum gesto',
+    'Cabeça animando',
+    'Luz acesa',
+    'Olhos se movendo',
+    'Língua aparecendo',
+    'Modo especial ✨',
+  ][fingerCount] ?? 'Nenhum gesto'
 
   return (
     <main>
-      {/* Animar: y (flutuar), rotate (inclinar cabeça) */}
       <motion.div style={{ y: headY }} className="cat">
         <img src={cabeca} alt="gato" className="cat__head" />
 
-        {/* scaleX: -1 espelha; rotate derivado do y da cabeça via spring */}
-        <motion.div
-          className="cat__ear cat__ear--left"
-          aria-hidden
-          style={{ scaleX: -1, rotate: earRotate }}
-        >
+        <motion.div className="cat__ear cat__ear--left" aria-hidden style={{ scaleX: -1, rotate: earRotate }}>
           <img src={orelha} alt="" />
         </motion.div>
 
-        {/* rotate derivado do y da cabeça via spring */}
-        <motion.div
-          className="cat__ear cat__ear--right"
-          aria-hidden
-          style={{ rotate: earRotate }}
-        >
+        <motion.div className="cat__ear cat__ear--right" aria-hidden style={{ rotate: earRotate }}>
           <img src={orelha} alt="" />
         </motion.div>
 
-        {/* Animar: rotate (girar), scale (pulsar) — x: "-50%" mantém a centralização */}
-        <motion.div
-          className="cat__forehead"
-          aria-hidden
-          initial={{ x: '-50%' }}
-          animate={{ x: '-50%' }}
-        >
+        <motion.div className="cat__forehead" aria-hidden initial={{ x: '-50%' }} animate={{ x: '-50%' }}>
           <img src={botao} alt="" />
           <motion.div
             className="cat__forehead-light"
@@ -117,76 +111,28 @@ function App() {
           />
         </motion.div>
 
-        {/* Animar: rotate (mover bigode) */}
-        <motion.div
-          className="cat__whiskers cat__whiskers--left"
-          aria-hidden
-          style={{ rotate: whiskerRotateLeft, originX: 1, originY: 0.5 }}
-        >
+        <motion.div className="cat__whiskers cat__whiskers--left" aria-hidden style={{ rotate: whiskerRotateLeft, originX: 1, originY: 0.5 }}>
           <img src={bigode} alt="" />
         </motion.div>
 
-        {/* Animar: rotate (mover bigode) */}
-        <motion.div
-          className="cat__whiskers cat__whiskers--right"
-          aria-hidden
-          style={{ rotate: whiskerRotateRight, originX: 0, originY: 0.5 }}
-        >
+        <motion.div className="cat__whiskers cat__whiskers--right" aria-hidden style={{ rotate: whiskerRotateRight, originX: 0, originY: 0.5 }}>
           <img src={bigode} alt="" />
         </motion.div>
 
-        {/* Animar: scaleY (piscar olho) */}
-        <motion.div
-          className="cat__eye cat__eye--left"
-          aria-hidden
-        >
-          {/* scaleX: -1 mantém o espelhamento do contorno */}
-          <motion.img
-            src={olhoContorno}
-            alt=""
-            className="cat__eye-outline"
-            initial={{ scaleX: -1 }}
-            animate={{ scaleX: -1 }}
-          />
-          {/* Animar: x, y (mover pupila) — x/y mantêm o posicionamento original */}
-          <motion.img
-            src={olhoPupila}
-            alt=""
-            className="cat__pupil cat__pupil--left"
-            style={{ x: leftPupilX, y: pupilStyleY }}
-          />
+        <motion.div className="cat__eye cat__eye--left" aria-hidden>
+          <motion.img src={olhoContorno} alt="" className="cat__eye-outline" initial={{ scaleX: -1 }} animate={{ scaleX: -1 }} />
+          <motion.img src={olhoPupila} alt="" className="cat__pupil cat__pupil--left" style={{ x: leftPupilX, y: pupilStyleY }} />
         </motion.div>
 
-        {/* Animar: scaleY (piscar olho) */}
-        <motion.div
-          className="cat__eye cat__eye--right"
-          aria-hidden
-        >
-          <motion.img
-            src={olhoContorno}
-            alt=""
-            className="cat__eye-outline"
-          />
-          {/* Animar: x, y (mover pupila) — x/y mantêm o posicionamento original */}
-          <motion.img
-            src={olhoPupila}
-            alt=""
-            className="cat__pupil cat__pupil--right"
-            style={{ x: rightPupilX, y: pupilStyleY }}
-          />
+        <motion.div className="cat__eye cat__eye--right" aria-hidden>
+          <motion.img src={olhoContorno} alt="" className="cat__eye-outline" />
+          <motion.img src={olhoPupila} alt="" className="cat__pupil cat__pupil--right" style={{ x: rightPupilX, y: pupilStyleY }} />
         </motion.div>
 
-        {/* Animar: scale (pulsar nariz) — x/y: "-50%" mantêm a centralização */}
-        <motion.div
-          className="cat__nose"
-          aria-hidden
-          initial={{ x: '-50%', y: '-50%' }}
-          animate={{ x: '-50%', y: '-50%' }}
-        >
+        <motion.div className="cat__nose" aria-hidden initial={{ x: '-50%', y: '-50%' }} animate={{ x: '-50%', y: '-50%' }}>
           <img src={nariz} alt="" />
         </motion.div>
 
-        {/* y: 0 = escondida, y: [valor > 0] = aparecendo */}
         <motion.div
           className="cat__tongue"
           aria-hidden
@@ -198,26 +144,27 @@ function App() {
         </motion.div>
       </motion.div>
 
-      <section className="controller">
-        <div className="controller__item">
-          <span>head</span>
-          <Switch isOn={isAnimating} onToggle={() => setIsAnimating(prev => !prev)} />
-        </div>
-        <div className="controller__item">
-          <span>light</span>
-          <Switch isOn={lightOn} onToggle={() => setLightOn(prev => !prev)} />
-        </div>
-        <div className="controller__item">
-          <span>eyes</span>
-          <Switch isOn={isMovingPupils} onToggle={movePupils} disabled={isMovingPupils} />
-        </div>
-        <div className="controller__item">
-          <span>tongue</span>
-          <Switch isOn={tongueOut} onToggle={() => setTongueOut(prev => !prev)} />
-        </div>
+      <section className="webcam-section">
+        <video
+          ref={videoRef}
+          className="webcam"
+          autoPlay
+          playsInline
+          muted
+        />
+        {status === 'denied' && (
+          <p className="webcam-error">Permissão da câmera negada. Libere o acesso nas configurações do navegador.</p>
+        )}
+        {status === 'error' && (
+          <p className="webcam-error">Não foi possível acessar a câmera.</p>
+        )}
       </section>
-    </main>
 
+      <div className="gesture-indicator">
+        <span className="gesture-indicator__count">{fingerCount}</span>
+        <span className="gesture-indicator__label">{gestureLabel}</span>
+      </div>
+    </main>
   )
 }
 

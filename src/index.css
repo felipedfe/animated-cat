@@ -11,9 +11,10 @@ main {
   background: #f8e8ec;
   min-height: 100vh;
   display: flex;
-  /* flex-direction: column; */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 24px;
 }
 
 /* Moldura = silhueta da cabeça (399×371 nos assets) */
@@ -23,7 +24,6 @@ main {
   aspect-ratio: 399 / 371;
   isolation: isolate;
   /* background-color: lightgrey; */
-  margin-right: 150px;
 }
 
 .cat img {
@@ -182,33 +182,46 @@ main {
   height: auto;
 }
 
-.controller {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 24px;
+.webcam-section {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 100;
 }
 
-.controller__item {
+.webcam {
+  width: 180px;
+  border-radius: 12px;
+  border: 2px solid #e8b4c0;
+  display: block;
+  transform: scaleX(-1); /* espelha pra ficar mais natural */
+}
+
+.webcam-error {
+  font-size: 13px;
+  color: #c0392b;
+  max-width: 180px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.gesture-indicator {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px solid #e8b4c0;
+  border-radius: 999px;
+  padding: 8px 20px;
+}
+
+.gesture-indicator__count {
+  font-size: 22px;
+  font-weight: bold;
+  min-width: 1ch;
+  text-align: center;
+}
+
+.gesture-indicator__label {
   font-size: 14px;
-}
-
-.switch {
-  flex-shrink: 0;
-  width: 52px;
-  height: 28px;
-  border-radius: 14px;
-  padding: 3px;
-}
-
-.switch__knob {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: white;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 }
