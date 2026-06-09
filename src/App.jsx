@@ -15,13 +15,15 @@ function App() {
   const headY = useMotionValue(0)
   const controlsRef = useRef(null)
   const [isMovingPupils, setIsMovingPupils] = useState(false)
+  const [showDebug, setShowDebug] = useState(false)
+  const debugCanvasRef = useRef(null)
 
   const { videoRef, status } = useWebcam()
-  const fingerCount = useHandTracker(videoRef)
+  const fingerCount = useHandTracker(videoRef, showDebug ? debugCanvasRef : null)
 
   const isAnimating = fingerCount === 1 || fingerCount === 4
   const lightOn = fingerCount === 2 || fingerCount === 4
-  const tongueOut = fingerCount === 4
+  const tongueOut = fingerCount === 2 || fingerCount === 4
 
   const pupilX = useMotionValue(0)
   const pupilY = useMotionValue(0)
@@ -144,13 +146,13 @@ function App() {
       </motion.div>
 
       <section className="webcam-section">
-        <video
-          ref={videoRef}
-          className="webcam"
-          autoPlay
-          playsInline
-          muted
-        />
+        <div className="webcam-wrapper">
+          <video ref={videoRef} className="webcam" autoPlay playsInline muted />
+          {showDebug && <canvas ref={debugCanvasRef} className="webcam-debug" />}
+        </div>
+        <button className="webcam-debug-toggle" onClick={() => setShowDebug(p => !p)}>
+          {showDebug ? 'debug on' : 'debug off'}
+        </button>
         {status === 'denied' && (
           <p className="webcam-error">Permissão da câmera negada. Libere o acesso nas configurações do navegador.</p>
         )}

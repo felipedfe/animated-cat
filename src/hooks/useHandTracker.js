@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { HandLandmarker, FilesetResolver } from '@mediapipe/tasks-vision'
+import { HandLandmarker, FilesetResolver, DrawingUtils } from '@mediapipe/tasks-vision'
 
 const DEBOUNCE_MS = 300
 
@@ -15,12 +15,14 @@ function countRaisedFingers(landmarks) {
   return count
 }
 
-export function useHandTracker(videoRef) {
+export function useHandTracker(videoRef, debugCanvasRef = null) {
   const [fingerCount, setFingerCount] = useState(0)
   const landmarkerRef = useRef(null)
   const rafRef = useRef(null)
   const debounceRef = useRef(null)
   const pendingRef = useRef(0)
+  const debugCanvasLatest = useRef(debugCanvasRef)
+  debugCanvasLatest.current = debugCanvasRef
 
   useEffect(() => {
     async function init() {
@@ -47,6 +49,19 @@ export function useHandTracker(videoRef) {
           const landmarks = result.landmarks[0]
 
           const count = landmarks ? countRaisedFingers(landmarks) : 0
+
+          const canvas = debugCanvasLatest.current?.current
+          if (canvas) {
+            canvas.width = video.videoWidth
+            canvas.height = video.videoHeight
+            const ctx = canvas.getContext('2d')
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            if (landmarks) {
+              const drawing = new DrawingUtils(ctx)
+              drawing.drawConnectors(landmarks, HandLandmarker.HAND_CONNECTIONS, { color: '#ffffff', lineWidth: 2 })
+              drawing.drawLandmarks(landmarks, { color: '#355dff', lineWidth: 1, radius: 4 })
+            }
+          }
 
           if (count !== pendingRef.current) {
             pendingRef.current = count
