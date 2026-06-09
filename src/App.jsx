@@ -161,7 +161,7 @@ function App() {
 
       <div className="gesture-indicator">
         <span className="gesture-indicator__count">{fingerCount}</span>
-        <span className="gesture-indicator__label">{gestureLabel}</span>
+        {/* <span className="gesture-indicator__label">{gestureLabel}</span> */}
       </div>
     </main>
   )

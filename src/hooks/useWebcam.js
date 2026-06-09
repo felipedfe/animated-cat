@@ -10,7 +10,7 @@ export function useWebcam() {
     async function startCamera() {
       setStatus('loading')
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true })
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
         if (videoRef.current) {
           videoRef.current.srcObject = stream
           setStatus('active')

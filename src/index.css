@@ -20,7 +20,7 @@ main {
 /* Moldura = silhueta da cabeça (399×371 nos assets) */
 .cat {
   position: relative;
-  width: min(92vw, 400px);
+  width: min(92vw, 430px);
   aspect-ratio: 399 / 371;
   isolation: isolate;
   /* background-color: lightgrey; */
@@ -190,7 +190,7 @@ main {
 }
 
 .webcam {
-  width: 180px;
+  width: 350px;
   border-radius: 12px;
   border: 2px solid #e8b4c0;
   display: block;
