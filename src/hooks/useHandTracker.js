@@ -9,16 +9,9 @@ const FINGER_PIPS = [6, 10, 14, 18]
 
 function countRaisedFingers(landmarks) {
   let count = 0
-
-  // Polegar: compara x da ponta vs x da articulação (lado direito da mão)
-  const thumbRaised = landmarks[4].x < landmarks[3].x
-  if (thumbRaised) count++
-
-  // Demais dedos: ponta acima (y menor) da articulação do meio
   for (let i = 0; i < FINGER_TIPS.length; i++) {
     if (landmarks[FINGER_TIPS[i]].y < landmarks[FINGER_PIPS[i]].y) count++
   }
-
   return count
 }
 

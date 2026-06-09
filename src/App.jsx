@@ -19,9 +19,9 @@ function App() {
   const { videoRef, status } = useWebcam()
   const fingerCount = useHandTracker(videoRef)
 
-  const isAnimating = fingerCount === 1 || fingerCount === 5
-  const lightOn = fingerCount === 2 || fingerCount === 5
-  const tongueOut = fingerCount === 4 || fingerCount === 5
+  const isAnimating = fingerCount === 1 || fingerCount === 4
+  const lightOn = fingerCount === 2 || fingerCount === 4
+  const tongueOut = fingerCount === 4
 
   const pupilX = useMotionValue(0)
   const pupilY = useMotionValue(0)
@@ -34,15 +34,15 @@ function App() {
   async function movePupils() {
     setIsMovingPupils(true)
     await Promise.all([
-      animate(pupilX, -12, { duration: 0.6, ease: 'easeInOut' }),
+      animate(pupilX, -12, { duration: 0.4, ease: 'easeInOut' }),
+      animate(pupilY, -5, { duration: 0.4, ease: 'easeInOut' }),
+    ])
+    await sleep(500)
+    await Promise.all([
+      animate(pupilX, 12, { duration: 0.6, ease: 'easeInOut' }),
       animate(pupilY, -5, { duration: 0.6, ease: 'easeInOut' }),
     ])
-    await sleep(1000)
-    await Promise.all([
-      animate(pupilX, 12, { duration: 0.9, ease: 'easeInOut' }),
-      animate(pupilY, -5, { duration: 0.9, ease: 'easeInOut' }),
-    ])
-    await sleep(1000)
+    await sleep(500)
     await Promise.all([
       animate(pupilX, 0, { duration: 0.4, ease: 'easeOut' }),
       animate(pupilY, 0, { duration: 0.4, ease: 'easeOut' }),
@@ -50,9 +50,9 @@ function App() {
     setIsMovingPupils(false)
   }
 
-  // Dispara a animação dos olhos quando o gesto for 3 ou 5 dedos
+  // Dispara a animação dos olhos quando o gesto for 3 ou 4 dedos
   useEffect(() => {
-    if ((fingerCount === 3 || fingerCount === 5) && !isMovingPupils) {
+    if ((fingerCount === 3 || fingerCount === 4) && !isMovingPupils) {
       movePupils()
     }
   }, [fingerCount])
@@ -60,7 +60,7 @@ function App() {
   useEffect(() => {
     if (isAnimating) {
       controlsRef.current = animate(headY, [0, -20, 0], {
-        duration: 3,
+        duration: 1.5,
         repeat: Infinity,
         ease: 'easeInOut',
       })
@@ -82,8 +82,7 @@ function App() {
     'Cabeça animando',
     'Luz acesa',
     'Olhos se movendo',
-    'Língua aparecendo',
-    'Modo especial ✨',
+    'Tudo!',
   ][fingerCount] ?? 'Nenhum gesto'
 
   return (
